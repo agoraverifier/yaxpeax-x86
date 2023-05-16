@@ -8931,7 +8931,12 @@ fn unlikely_operands<
         OperandCode::G_xmm_Eq => {
             instruction.regs[0].bank = RegisterBank::X;
             if mem_oper == OperandSpec::RegMMM {
-                instruction.regs[1].bank = RegisterBank::Q;
+                if instruction.prefixes.rex_unchecked().w() {
+                    instruction.regs[1].bank = RegisterBank::Q;
+                } else {
+                    instruction.opcode = Opcode::MOVD;
+                    instruction.regs[1].bank = RegisterBank::D;
+                }
             } else {
                 instruction.mem_size = 8;
             }
